@@ -9,7 +9,7 @@ const Navbar = () => {
 
   const { isOpen, onToggle } = useDisclosure();
   const router = useRouter();
-
+   
   return (
     <Flex w="100%" justifyContent="flex-end" alignItems="center" bg="white" h="4rem" pr="7" borderBottom="1px solid #e5e7eb" >
         <InfoIcon fontSize="md" color="#1E293B" />
