@@ -1,56 +1,40 @@
-import {
-  Link as ChakraLink,
-  Text,
-  Code,
-  List,
-  ListIcon,
-  ListItem,
-} from '@chakra-ui/react'
-import { CheckCircleIcon, LinkIcon } from '@chakra-ui/icons'
+import { AtSignIcon, EmailIcon, LockIcon } from '@chakra-ui/icons';
+import { Button, Flex, Input, InputGroup, InputLeftElement, InputRightElement, Square, Text } from '@chakra-ui/react';
+import { NextPage } from 'next';
+import React from 'react';
 
-import { Hero } from '../components/Hero'
-import { Container } from '../components/Container'
-import { Main } from '../components/Main'
-import { DarkModeSwitch } from '../components/DarkModeSwitch'
-import { CTA } from '../components/CTA'
-import { Footer } from '../components/Footer'
+// import { Container } from './styles';
 
-const Index = () => (
-  <Container height="100vh">
-    <Hero />
-    <Main>
-      <Text>
-        Example repository of <Code>Next.js</Code> + <Code>chakra-ui</Code> +{' '}
-        <Code>TypeScript</Code>.
-      </Text>
+const Login: NextPage = () => {
+  return (
+    <Square bg="#d2d6de" minWidth="100%" minHeight="100vh" display="flex" flexDirection="column">
+      <Flex mb="5" >  
+        <Text fontSize="4xl" fontFamily="Source Sans Pro" color="#333" fontWeight="bold" >Power</Text>
+        <Text fontSize="4xl" fontFamily="Source Sans Pro" color="#333" fontWeight="200" >HUB</Text>
+      </Flex>
+      <Flex bg="white" pt="5" w="370px" h="300px" flexDirection="column" alignItems="center" >
+        <Text fontSize="sm" mb="5" fontFamily="Source Sans Pro" fontWeight="300" >Sign in to start your session</Text>
+        <InputGroup w="330px" mb="5" h="34px">
+          <InputRightElement
+            pointerEvents='none'
+            children={<EmailIcon color='#777' />}
+          />
+          <Input type='email'fontFamily="Source Sans Pro" borderRadius="none" placeholder='Email' />
+        </InputGroup>
+        <InputGroup w="330px" mb="10" h="34px" >
+          <InputRightElement
+            pointerEvents='none'
+            children={<LockIcon color='#777' />}
+          />
+          <Input type='email' fontFamily="Source Sans Pro" borderRadius="none" placeholder='Password' />
+        </InputGroup>
+        <Flex justifyContent="space-between" alignItems="center" w="330px" >
+          <Text color="#337ab7" fontSize="sm" fontFamily="Source Sans Pro" >I forgot my password</Text>
+          <Button bg="#3c8dbc" borderRadius="none" color="white" fontSize="sm" fontFamily="Source Sans Pro" borderColor="#367fa9" >Sign In</Button>
+        </Flex>
+      </Flex>
+    </Square>
+  );
+}
 
-      <List spacing={3} my={0}>
-        <ListItem>
-          <ListIcon as={CheckCircleIcon} color="green.500" />
-          <ChakraLink
-            isExternal
-            href="https://chakra-ui.com"
-            flexGrow={1}
-            mr={2}
-          >
-            Chakra UI <LinkIcon />
-          </ChakraLink>
-        </ListItem>
-        <ListItem>
-          <ListIcon as={CheckCircleIcon} color="green.500" />
-          <ChakraLink isExternal href="https://nextjs.org" flexGrow={1} mr={2}>
-            Next.js <LinkIcon />
-          </ChakraLink>
-        </ListItem>
-      </List>
-    </Main>
-
-    <DarkModeSwitch />
-    <Footer>
-      <Text>Next ❤️ Chakra</Text>
-    </Footer>
-    <CTA />
-  </Container>
-)
-
-export default Index
+export default Login;
