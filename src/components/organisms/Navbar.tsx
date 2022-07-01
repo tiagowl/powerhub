@@ -16,7 +16,7 @@ const Navbar = () => {
         <BellIcon fontSize="xl" ml="4" color="#1E293B" />
         <Text fontSize="xl" ml="2" color="#cfd2dc" >|</Text>
         <Avatar size="sm" cursor="pointer" ml="2" onClick={onToggle} />
-        <Text fontSize="sm" cursor="pointer" fontFamily="Nunito" ml="2" onClick={onToggle} fontWeight="bold" >Academia Inc.</Text>
+        <Text fontSize="sm" cursor="pointer" fontFamily="Nunito" ml="2" onClick={onToggle} fontWeight="bold" >{typeof window !== "undefined" && sessionStorage.getItem("name")}</Text>
         <ChevronDownIcon cursor="pointer" fontSize="md" ml="1" onClick={onToggle} color="#b0b2b8" />
         <Fade in={isOpen}  >
         <Flex w="174px" right="4" zIndex="1" borderRadius="4px" flexDirection="column"  mt="2" position="absolute"  bg="white"  h="220px">
@@ -24,12 +24,12 @@ const Navbar = () => {
                 <Avatar src="" size="md" />
             </Square>
             <Flex flexDirection="column" borderEndEndRadius="4px" borderEndStartRadius="4px" bg="white" w="175px" h="100%" borderLeft="1px solid rgb(226, 232, 240)" borderRight="1px solid rgb(226, 232, 240)" borderBottom="1px solid rgb(226, 232, 240)" >
-                <Text fontFamily="Nunito" fontWeight="bold" mt="2" ml="2.5" fontSize="md" >Nome</Text>
+                <Text fontFamily="Nunito" fontWeight="bold" mt="2" ml="2.5" fontSize="md" >{typeof window !== "undefined" && sessionStorage.getItem("name")}</Text>
                 <Text fontSize="xs" pl="2.5" pb="1" borderBottom="1.7px solid rgb(226 232 240 / 1)" color="rgb(100, 116, 139)" fontFamily="Nunito" >
                   <i>Administrador</i>
                 </Text>
-                <Text fontFamily="Nunito" fontWeight="bold" cursor="pointer" mt="2" ml="2.5" onClick={()=>router.push("/main/perfil/1")} fontSize="sm" >Ver perfil</Text>
-                <Text fontFamily="Nunito" fontWeight="bold" cursor="pointer" mt="2" ml="2.5" fontSize="sm" >Sair</Text>
+                <Text fontFamily="Nunito" fontWeight="bold" cursor="pointer" mt="2" ml="2.5" onClick={()=>router.push(`/main/perfil/${typeof window !== "undefined" && sessionStorage.getItem("idUser")}`)} fontSize="sm" >Ver perfil</Text>
+                <Text fontFamily="Nunito" onClick={()=>router.push("/")} fontWeight="bold" cursor="pointer" mt="2" ml="2.5" fontSize="sm" >Sair</Text>
             </Flex>
         </Flex>
     </Fade>
