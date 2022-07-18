@@ -1,4 +1,4 @@
-import { AddIcon } from '@chakra-ui/icons';
+import { AddIcon, CopyIcon } from '@chakra-ui/icons';
 import { Avatar, Button, Center, Flex, Input, Modal, ModalBody, ModalCloseButton, ModalContent, ModalFooter, ModalHeader, ModalOverlay, Select, Tab, TabList, TabPanel, TabPanels, Tabs, Text, Textarea, toast, useDisclosure, useToast } from '@chakra-ui/react';
 import { NextPage } from 'next';
 import { useRouter } from 'next/router';
@@ -7,6 +7,8 @@ import { FaBook, FaRegNewspaper } from 'react-icons/fa';
 import Dashboard from '../../../components/templates/Dashboard';
 import api from '../../../services/api';
 import {Exercicie, Registration, Workout} from '../../../global/interfaces';
+import { PDFDownloadLink } from '@react-pdf/renderer';
+import Pdf from "../../../generator/pdf";
 
 // import { Container } from './styles';
 
@@ -33,6 +35,7 @@ const Perfil: NextPage = () => {
     }, []);
 
     const fetchProfile = async () => {
+        setLoading(true);
         if(router?.query?.id){
             try{
                 const response = await api.get("/rest/v1/registrations", {
@@ -42,6 +45,7 @@ const Perfil: NextPage = () => {
                     }
                 });
                 if(response?.status === 200){
+                    setLoading(false);
                     setProfile(response?.data);
                 }
             }catch(err){
@@ -189,7 +193,12 @@ const Perfil: NextPage = () => {
                                 <Flex flexDirection="column" h="auto" bg="white" borderRadius="2px" w="100%" border="1px solid rgb(226, 232, 240)" >
                                     <Flex justifyContent="space-between" alignItems="center" w="100%" pl="4" pr="4" pt="4" borderBottom="1px solid #edf1f8" pb="3" >
                                         <Text fontSize="lg" fontWeight="bold" color="rgb(30, 41, 59)" fontFamily="Nunito" >Treino</Text>
-                                        <Button onClick={()=>setOpen(true)} leftIcon={<AddIcon color="white" />} fontFamily="Nunito" borderRadius="0.25rem" color="white" boxShadow="0 1px 2px 0 rgb(0 0 0 / .05)" bg="rgb(99, 102, 241)" >Adicionar</Button>
+                                        <Flex>
+                                            {!loading && <PDFDownloadLink fileName="Treino" document={<Pdf student={profile?.name} data={workouts} />} >
+                                                <Button bg="#dd4b39" borderRadius="3px" leftIcon={<CopyIcon color="white" />} border="1px solid #d73925" fontFamily="Nunito" color="white" >Exportar PDF</Button>
+                                            </PDFDownloadLink>}
+                                            <Button onClick={()=>setOpen(true)} ml="3" leftIcon={<AddIcon color="white" />} fontFamily="Nunito" borderRadius="0.25rem" color="white" boxShadow="0 1px 2px 0 rgb(0 0 0 / .05)" bg="rgb(99, 102, 241)" >Adicionar</Button>
+                                        </Flex>
                                     </Flex>
                                     <Flex w="100%" height="auto" pl="3" pr="3" flexDirection="column" pt="3" pb="4"  >
                                             <Flex w="100%" borderRadius="2px" bg="rgb(248, 250, 252)" pl="2" h="34px" alignItems="center">

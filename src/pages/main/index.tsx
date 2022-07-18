@@ -39,7 +39,7 @@ const Main: NextPage = () => {
   return(
       <Dashboard>
           <Flex w="100%" borderRadius="3px" h="65px" pl="4" pr="4" alignItems="center" mb="7" justifyContent="space-between" bg="white"  >
-            <Text fontSize="sm" fontFamily="Nunito"  color="#7e7e7e" >Boa tarde Academia Inc. O que você deseja fazer hoje?</Text>
+            <Text fontSize="sm" fontFamily="Nunito"  color="#7e7e7e" >Boa tarde Top Trainer. O que você deseja fazer hoje?</Text>
             <Button fontSize="xs" color="white" borderRadius="5px"  bg="#a461d8" fontFamily="Nunito" >Enviar Contato</Button>
           </Flex>
           <Flex w="100%" justifyContent="space-between" alignItems="center" mb="3" > 
