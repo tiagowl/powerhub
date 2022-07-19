@@ -1,11 +1,12 @@
 import { AddIcon } from '@chakra-ui/icons';
-import { Avatar, Button, Flex, Tab, TabList, TabPanel, TabPanels, Tabs, Text, useToast } from '@chakra-ui/react';
+import { Avatar, Button, Flex, Input, Tab, TabList, TabPanel, TabPanels, Tabs, Text, useToast } from '@chakra-ui/react';
 import { NextPage } from 'next';
 import { useRouter } from 'next/router';
 import React, { useEffect, useState } from 'react';
 import Dashboard from '../../../components/templates/Dashboard';
 import api from '../../../services/api';
 import {Registration} from '../../../global/interfaces';
+import supabase from '../../../services/supabase';
 
 // import { Container } from './styles';
 
@@ -16,13 +17,44 @@ const Cadastros: NextPage = () => {
     const [teachers, setTeachers] = useState<Registration[]>();
     const [students, setStudents] = useState<Registration[]>();
     const [Initialrow, setInitialRow] = useState(0);
-    const [rowPerPage, setRowPerPage] = useState(2)
-    const [lastRow, setLastRow] = useState(Initialrow + rowPerPage)
+    const [rowPerPage, setRowPerPage] = useState(2);
+    const [type, setType] = useState(0);
+    const [lastRow, setLastRow] = useState(Initialrow + rowPerPage);
+    const [filters, setFilters] = useState<Registration>();
 
     useEffect(()=>{
         fetchRegistrations(1);
         fetchRegistrations(2);
     }, []);
+
+    useEffect(()=>{
+        fetchRegistrationsWithFilters(type);
+    }, [filters])
+
+    const fetchRegistrationsWithFilters = async(type: number) =>{
+        let {data, error} = await supabase
+        .from("registrations")
+        .select("*")
+        .eq("type", type)
+        .eq("gym", `${JSON.parse(sessionStorage.getItem("gym"))}`)
+        .ilike("name", `%${filters?.name}%`)
+
+        if(data){
+            switch(type){
+                case 1:
+                    setStudents(data);
+                    break;
+                case 2:
+                    setTeachers(data);
+            }
+        }else if(error){
+            return toast({
+                title: `${error}`,
+                status: "warning",
+                isClosable: true
+            })
+        }
+    }
 
     const fetchRegistrations = async (type: number) => {
         try{
@@ -62,70 +94,80 @@ const Cadastros: NextPage = () => {
 
             <TabPanels>
                 <TabPanel>
-                    <Flex flexDirection="column" bg="white" borderRadius="2px" w="650px" h="auto" border="1px solid rgb(226, 232, 240)" >
-                        <Flex justifyContent="space-between" alignItems="center" w="100%" pl="4" pr="4" pt="4" borderBottom="1px solid #edf1f8" pb="3" >
-                            <Text fontSize="lg" fontWeight="bold" color="rgb(30, 41, 59)" fontFamily="Nunito" >Alunos</Text>
-                            <Button onClick={()=>router.push("/main/cadastros/adicionar")} leftIcon={<AddIcon color="white" />} fontFamily="Nunito" borderRadius="0.25rem" color="white" boxShadow="0 1px 2px 0 rgb(0 0 0 / .05)" bg="rgb(99, 102, 241)" >Adicionar</Button>
+                    <Flex flexDirection="column" w="100%" >
+                        <Flex w="650px" mb="3" >
+                            <Input type="text" value={filters?.name} onChange={(e)=>{setFilters({...filters, name: e.target.value}), setType(1)}} borderColor="gray.300" fontFamily="Nunito" w="30%" size="md" placeholder="Buscar pelo nome" />
                         </Flex>
-                        <Flex w="100%" height="auto" pl="3" pr="3" flexDirection="column" pt="3" pb="4"  >
-                            <Flex w="100%" borderRadius="2px" bg="rgb(248, 250, 252)" pl="2" h="34px" alignItems="center">
-                                <Text fontSize="sm" fontWeight="bold" mr="25%" fontFamily="Nunito" color="rgb(148, 163, 184)" >Aluno</Text>
-                                <Text fontSize="sm" fontWeight="bold" mr="7" fontFamily="Nunito" color="rgb(148, 163, 184)" >Idade</Text>
-                                <Text fontSize="sm" fontWeight="bold" mr="8" fontFamily="Nunito" color="rgb(148, 163, 184)" >Peso</Text>
-                                <Text fontSize="sm" fontWeight="bold" mr="8" fontFamily="Nunito" color="rgb(148, 163, 184)" >Altura</Text>
-                                <Text fontSize="sm" fontWeight="bold" mr="8" fontFamily="Nunito" color="rgb(148, 163, 184)" >Plano</Text>
-                                <Text fontSize="sm" fontWeight="bold" mr="8" fontFamily="Nunito" color="rgb(148, 163, 184)" >Objetivo</Text>
-                                <Text fontSize="sm" fontWeight="bold" mr="8" fontFamily="Nunito" color="rgb(148, 163, 184)" >Situação</Text>
+                        <Flex flexDirection="column" bg="white" borderRadius="2px" w="650px" h="auto" border="1px solid rgb(226, 232, 240)" >
+                            <Flex justifyContent="space-between" alignItems="center" w="100%" pl="4" pr="4" pt="4" borderBottom="1px solid #edf1f8" pb="3" >
+                                <Text fontSize="lg" fontWeight="bold" color="rgb(30, 41, 59)" fontFamily="Nunito" >Alunos</Text>
+                                <Button onClick={()=>router.push("/main/cadastros/adicionar")} leftIcon={<AddIcon color="white" />} fontFamily="Nunito" borderRadius="0.25rem" color="white" boxShadow="0 1px 2px 0 rgb(0 0 0 / .05)" bg="rgb(99, 102, 241)" >Adicionar</Button>
                             </Flex>
-                            {students?.map((student)=>(
-                                <Flex w="100%" pl="3" pt="3" pb="3" alignItems="center" borderBottom="1px solid #edf1f8" >
-                                    <Flex w="100%" alignItems="center" >
-                                        <Avatar size="sm" mr="2" />
-                                        <Text fontSize="sm" cursor="pointer" onClick={()=>router.push(`/main/perfil/${student?.id}`)} fontWeight="bold" mr="25%" fontFamily="Nunito" color="rgb(30, 41, 59)" >{student?.name}</Text>
-                                    </Flex>
-                                    <Text fontSize="sm" fontWeight="bold" mr="7" fontFamily="Nunito" color="rgb(30, 41, 59)" >{student?.age}</Text>
-                                    <Text fontSize="sm" fontWeight="bold" mr="8" fontFamily="Nunito" color="rgb(30, 41, 59)" >Peso</Text>
-                                    <Text fontSize="sm" fontWeight="bold" mr="8" fontFamily="Nunito" color="rgb(30, 41, 59)" >Altura</Text>
-                                    <Text fontSize="sm" fontWeight="bold" mr="8" fontFamily="Nunito" color="rgb(30, 41, 59)" >Plano</Text>
-                                    <Text fontSize="sm" fontWeight="bold" mr="8" fontFamily="Nunito" color="rrgb(30, 41, 59)" >Objetivo</Text>
-                                    <Text fontSize="sm" fontWeight="bold" mr="8" fontFamily="Nunito" color="rgb(30, 41, 59)" >Situação</Text>
+                            <Flex w="100%" height="auto" pl="3" pr="3" flexDirection="column" pt="3" pb="4"  >
+                                <Flex w="100%" borderRadius="2px" bg="rgb(248, 250, 252)" pl="2" h="34px" alignItems="center">
+                                    <Text fontSize="sm" fontWeight="bold" mr="25%" fontFamily="Nunito" color="rgb(148, 163, 184)" >Aluno</Text>
+                                    <Text fontSize="sm" fontWeight="bold" mr="7" fontFamily="Nunito" color="rgb(148, 163, 184)" >Idade</Text>
+                                    <Text fontSize="sm" fontWeight="bold" mr="8" fontFamily="Nunito" color="rgb(148, 163, 184)" >Peso</Text>
+                                    <Text fontSize="sm" fontWeight="bold" mr="8" fontFamily="Nunito" color="rgb(148, 163, 184)" >Altura</Text>
+                                    <Text fontSize="sm" fontWeight="bold" mr="8" fontFamily="Nunito" color="rgb(148, 163, 184)" >Plano</Text>
+                                    <Text fontSize="sm" fontWeight="bold" mr="8" fontFamily="Nunito" color="rgb(148, 163, 184)" >Objetivo</Text>
+                                    <Text fontSize="sm" fontWeight="bold" mr="8" fontFamily="Nunito" color="rgb(148, 163, 184)" >Situação</Text>
                                 </Flex>
-                            ))}
+                                {students?.map((student)=>(
+                                    <Flex w="100%" pl="3" pt="3" pb="3" alignItems="center" borderBottom="1px solid #edf1f8" >
+                                        <Flex w="100%" alignItems="center" >
+                                            <Avatar size="sm" mr="2" />
+                                            <Text fontSize="sm" cursor="pointer" onClick={()=>router.push(`/main/perfil/${student?.id}`)} fontWeight="bold" mr="25%" fontFamily="Nunito" color="rgb(30, 41, 59)" >{student?.name}</Text>
+                                        </Flex>
+                                        <Text fontSize="sm" fontWeight="bold" mr="7" fontFamily="Nunito" color="rgb(30, 41, 59)" >{student?.age}</Text>
+                                        <Text fontSize="sm" fontWeight="bold" mr="8" fontFamily="Nunito" color="rgb(30, 41, 59)" >Peso</Text>
+                                        <Text fontSize="sm" fontWeight="bold" mr="8" fontFamily="Nunito" color="rgb(30, 41, 59)" >Altura</Text>
+                                        <Text fontSize="sm" fontWeight="bold" mr="8" fontFamily="Nunito" color="rgb(30, 41, 59)" >Plano</Text>
+                                        <Text fontSize="sm" fontWeight="bold" mr="8" fontFamily="Nunito" color="rrgb(30, 41, 59)" >Objetivo</Text>
+                                        <Text fontSize="sm" fontWeight="bold" mr="8" fontFamily="Nunito" color="rgb(30, 41, 59)" >Situação</Text>
+                                    </Flex>
+                                ))}
+                            </Flex>
                         </Flex>
                     </Flex>
                 </TabPanel>
                 <TabPanel>
-                <Flex flexDirection="column" bg="white" borderRadius="2px" w="650px" h="auto" border="1px solid rgb(226, 232, 240)" >
-                        <Flex justifyContent="space-between" alignItems="center" w="100%" pl="4" pr="4" pt="4" borderBottom="1px solid #edf1f8" pb="3" >
-                            <Text fontSize="lg" fontWeight="bold" color="rgb(30, 41, 59)" fontFamily="Nunito" >Professores</Text>
-                            <Button onClick={()=>router.push("/main/cadastros/adicionar")} leftIcon={<AddIcon color="white" />} fontFamily="Nunito" borderRadius="0.25rem" color="white" boxShadow="0 1px 2px 0 rgb(0 0 0 / .05)" bg="rgb(99, 102, 241)" >Adicionar</Button>
-                        </Flex>
-                        <Flex w="100%" height="auto" pl="3" pr="3" flexDirection="column" pt="3" pb="4"  >
-                            <Flex w="100%" borderRadius="2px" bg="rgb(248, 250, 252)" pl="2" h="34px" alignItems="center">
-                                <Text fontSize="sm" fontWeight="bold" mr="25%" fontFamily="Nunito" color="rgb(148, 163, 184)" >Aluno</Text>
-                                <Text fontSize="sm" fontWeight="bold" mr="7" fontFamily="Nunito" color="rgb(148, 163, 184)" >Idade</Text>
-                                <Text fontSize="sm" fontWeight="bold" mr="8" fontFamily="Nunito" color="rgb(148, 163, 184)" >Peso</Text>
-                                <Text fontSize="sm" fontWeight="bold" mr="8" fontFamily="Nunito" color="rgb(148, 163, 184)" >Altura</Text>
-                                <Text fontSize="sm" fontWeight="bold" mr="8" fontFamily="Nunito" color="rgb(148, 163, 184)" >Plano</Text>
-                                <Text fontSize="sm" fontWeight="bold" mr="8" fontFamily="Nunito" color="rgb(148, 163, 184)" >Objetivo</Text>
-                                <Text fontSize="sm" fontWeight="bold" mr="8" fontFamily="Nunito" color="rgb(148, 163, 184)" >Situação</Text>
-                            </Flex>
-                            {teachers?.map((student)=>(
-                                <Flex w="100%" pl="3" pt="3" pb="3" alignItems="center" borderBottom="1px solid #edf1f8" >
-                                    <Flex w="100%" alignItems="center" >
-                                        <Avatar size="sm" mr="2" />
-                                        <Text fontSize="sm" cursor="pointer" onClick={()=>router.push(`/main/perfil/${student?.id}`)} fontWeight="bold" mr="25%" fontFamily="Nunito" color="rgb(30, 41, 59)" >{student?.name}</Text>
-                                    </Flex>
-                                    <Text fontSize="sm" fontWeight="bold" mr="7" fontFamily="Nunito" color="rgb(30, 41, 59)" >{student?.age}</Text>
-                                    <Text fontSize="sm" fontWeight="bold" mr="8" fontFamily="Nunito" color="rgb(30, 41, 59)" >Peso</Text>
-                                    <Text fontSize="sm" fontWeight="bold" mr="8" fontFamily="Nunito" color="rgb(30, 41, 59)" >Altura</Text>
-                                    <Text fontSize="sm" fontWeight="bold" mr="8" fontFamily="Nunito" color="rgb(30, 41, 59)" >Plano</Text>
-                                    <Text fontSize="sm" fontWeight="bold" mr="8" fontFamily="Nunito" color="rrgb(30, 41, 59)" >Objetivo</Text>
-                                    <Text fontSize="sm" fontWeight="bold" mr="8" fontFamily="Nunito" color="rgb(30, 41, 59)" >Situação</Text>
-                                </Flex>
-                            ))}
-                        </Flex>
+                <Flex flexDirection="column" w="100%" >
+                    <Flex w="650px" mb="3" >
+                        <Input type="text" value={filters?.name} onChange={(e)=>{setFilters({...filters, name: e.target.value}), setType(2)}} borderColor="gray.300" fontFamily="Nunito" w="30%" size="md" placeholder="Buscar pelo nome" />
                     </Flex>
+                    <Flex flexDirection="column" bg="white" borderRadius="2px" w="650px" h="auto" border="1px solid rgb(226, 232, 240)" >
+                            <Flex justifyContent="space-between" alignItems="center" w="100%" pl="4" pr="4" pt="4" borderBottom="1px solid #edf1f8" pb="3" >
+                                <Text fontSize="lg" fontWeight="bold" color="rgb(30, 41, 59)" fontFamily="Nunito" >Professores</Text>
+                                <Button onClick={()=>router.push("/main/cadastros/adicionar")} leftIcon={<AddIcon color="white" />} fontFamily="Nunito" borderRadius="0.25rem" color="white" boxShadow="0 1px 2px 0 rgb(0 0 0 / .05)" bg="rgb(99, 102, 241)" >Adicionar</Button>
+                            </Flex>
+                            <Flex w="100%" height="auto" pl="3" pr="3" flexDirection="column" pt="3" pb="4"  >
+                                <Flex w="100%" borderRadius="2px" bg="rgb(248, 250, 252)" pl="2" h="34px" alignItems="center">
+                                    <Text fontSize="sm" fontWeight="bold" mr="25%" fontFamily="Nunito" color="rgb(148, 163, 184)" >Aluno</Text>
+                                    <Text fontSize="sm" fontWeight="bold" mr="7" fontFamily="Nunito" color="rgb(148, 163, 184)" >Idade</Text>
+                                    <Text fontSize="sm" fontWeight="bold" mr="8" fontFamily="Nunito" color="rgb(148, 163, 184)" >Peso</Text>
+                                    <Text fontSize="sm" fontWeight="bold" mr="8" fontFamily="Nunito" color="rgb(148, 163, 184)" >Altura</Text>
+                                    <Text fontSize="sm" fontWeight="bold" mr="8" fontFamily="Nunito" color="rgb(148, 163, 184)" >Plano</Text>
+                                    <Text fontSize="sm" fontWeight="bold" mr="8" fontFamily="Nunito" color="rgb(148, 163, 184)" >Objetivo</Text>
+                                    <Text fontSize="sm" fontWeight="bold" mr="8" fontFamily="Nunito" color="rgb(148, 163, 184)" >Situação</Text>
+                                </Flex>
+                                {teachers?.map((student)=>(
+                                    <Flex w="100%" pl="3" pt="3" pb="3" alignItems="center" borderBottom="1px solid #edf1f8" >
+                                        <Flex w="100%" alignItems="center" >
+                                            <Avatar size="sm" mr="2" />
+                                            <Text fontSize="sm" cursor="pointer" onClick={()=>router.push(`/main/perfil/${student?.id}`)} fontWeight="bold" mr="25%" fontFamily="Nunito" color="rgb(30, 41, 59)" >{student?.name}</Text>
+                                        </Flex>
+                                        <Text fontSize="sm" fontWeight="bold" mr="7" fontFamily="Nunito" color="rgb(30, 41, 59)" >{student?.age}</Text>
+                                        <Text fontSize="sm" fontWeight="bold" mr="8" fontFamily="Nunito" color="rgb(30, 41, 59)" >Peso</Text>
+                                        <Text fontSize="sm" fontWeight="bold" mr="8" fontFamily="Nunito" color="rgb(30, 41, 59)" >Altura</Text>
+                                        <Text fontSize="sm" fontWeight="bold" mr="8" fontFamily="Nunito" color="rgb(30, 41, 59)" >Plano</Text>
+                                        <Text fontSize="sm" fontWeight="bold" mr="8" fontFamily="Nunito" color="rrgb(30, 41, 59)" >Objetivo</Text>
+                                        <Text fontSize="sm" fontWeight="bold" mr="8" fontFamily="Nunito" color="rgb(30, 41, 59)" >Situação</Text>
+                                    </Flex>
+                                ))}
+                            </Flex>
+                        </Flex>
+                </Flex>
                 </TabPanel>
             </TabPanels>
         </Tabs>
