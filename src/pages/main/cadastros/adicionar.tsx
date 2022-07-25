@@ -1,9 +1,9 @@
 import { Button, Flex, Input, Select, Text, Textarea, useToast } from '@chakra-ui/react';
 import { NextPage } from 'next';
 import { useRouter } from 'next/router';
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import Dashboard from '../../../components/templates/Dashboard';
-import { Registration } from '../../../global/interfaces';
+import { Plan, Registration } from '../../../global/interfaces';
 import api from '../../../services/api';
 
 // import { Container } from './styles';
@@ -13,8 +13,13 @@ const Adicionar: NextPage = () => {
     const [payload, setPayload] = useState<Registration>();
     const [loading, setLoading] = useState(false);
     const [type, setType] = useState(1);
+    const [plans, setPlans] = useState<Plan[]>();
     const toast = useToast();
     const router = useRouter();
+
+    useEffect(()=>{
+        fetchPlans();
+    }, []);
 
     const register = async () => {
         setLoading(true);
@@ -31,6 +36,27 @@ const Adicionar: NextPage = () => {
             }
         }catch(err){
             setLoading(false);
+            return toast({
+                title: "O nome e o tipo precisam ser preenchidos.",
+                status: "warning",
+                isClosable: true
+            })
+        }
+    }
+
+    const fetchPlans = async () => {
+        try{
+            const response = await api.get("/rest/v1/plans", {
+                params:{
+                    select: "*",
+                    gym: `eq.${sessionStorage.getItem("gym")}`
+                }
+            })
+            if(response?.status === 200){
+                setPlans(response?.data);
+            }
+        }catch(err){
+
         }
     }
 
@@ -63,6 +89,23 @@ const Adicionar: NextPage = () => {
             <Flex pl="4" pr="4" w="100%" h="auto" mt="3" flexDirection="column" justifyContent="flex-start" >
                 <Text fontSize="sm" fontWeight="bold" fontFamily="Nunito" >Ocupação</Text>
                 <Input size="lg" value={payload?.ocupation} onChange={(e)=>setPayload({...payload, ocupation: e.target.value})} type="text" />
+            </Flex>
+            <Flex pl="4" pr="4" w="100%" h="auto" mt="3" flexDirection="column" justifyContent="flex-start" >
+                <Text fontSize="sm" fontWeight="bold" fontFamily="Nunito" >Objetivo</Text>
+                <Select size="lg" value={payload?.objective} onChange={(e)=>setPayload({...payload, objective: e.target.value})}>
+                        <option selected value="Hipertrofia">Hipertrofia</option>
+                        <option value="Perda de peso">Perda de peso</option>
+                        <option value="Condicionamento">Condicionamento</option>
+                        <option value="Saúde">Saúde</option>
+                </Select>
+            </Flex>
+            <Flex pl="4" pr="4" w="100%" h="auto" mt="3" flexDirection="column" justifyContent="flex-start" >
+                <Text fontSize="sm" fontWeight="bold" fontFamily="Nunito" >Plano</Text>
+                <Select size="lg" value={payload?.plan} onChange={(e)=>setPayload({...payload, plan: e.target.value})}>
+                    {plans?.map((plan)=>(
+                        <option value={plan?.description}>{plan?.description}</option>
+                    ))}
+                </Select>
             </Flex>
             <Flex pl="4"  pr="4" w="100%" h="auto" mt="3" flexDirection="column" justifyContent="flex-start" >
                 <Text fontSize="sm" fontWeight="bold" fontFamily="Nunito" >Notas</Text>

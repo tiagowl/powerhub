@@ -10,6 +10,8 @@ export interface Registration{
     weight: number;
     height: string;
     email: string;
+    plan: string;
+    objective: string;
 }
 
 export interface Exercicie{
@@ -29,4 +31,11 @@ export interface Workout{
     repetitions: number;
     series: number;
     user: number;
+    separation: string;
+}
+
+export interface Plan{
+    id: number;
+    description: string;
+    gym: number;
 }

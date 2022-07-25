@@ -1,4 +1,4 @@
-import { TimeIcon } from '@chakra-ui/icons';
+import { CalendarIcon, RepeatClockIcon, TimeIcon } from '@chakra-ui/icons';
 import { Avatar, background, Circle, Flex, Spinner, Text } from '@chakra-ui/react';
 import { useRouter } from 'next/router';
 import React, { useEffect, useState } from 'react';
@@ -58,9 +58,9 @@ const Sidebar = () => {
             <HiUsers color="#6c83a7" style={{marginRight: "10px"}} />
             <Text fontSize="sm" color="white" fontWeight="bold" fontFamily="Nunito" >Cadastros</Text>
         </Flex>
-        <Flex pl="5" cursor="pointer" onClick={()=>router.push("/main/exercicios")} pt="3.5" pb="3.5" _hover={{backgroundColor: "#161e2b"}} alignItems="center" >
-            <CgGym color="#6c83a7" style={{marginRight: "10px"}} />
-            <Text fontSize="sm" color="white" fontWeight="bold" fontFamily="Nunito" >Exercícios</Text>
+        <Flex pl="5" cursor="pointer" onClick={()=>router.push("/main/planos")} pt="3.5" pb="3.5" _hover={{backgroundColor: "#161e2b"}} alignItems="center" >
+            <CalendarIcon color="#6c83a7" mr="10px" />
+            <Text fontSize="sm" color="white" fontWeight="bold" fontFamily="Nunito" >Planos</Text>
         </Flex>
     </Flex>
   ); 
