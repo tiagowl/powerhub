@@ -1,4 +1,4 @@
-import { AddIcon, CalendarIcon, CheckCircleIcon, CopyIcon } from '@chakra-ui/icons';
+import { AddIcon, CalendarIcon, CheckCircleIcon, CopyIcon, DeleteIcon } from '@chakra-ui/icons';
 import { Avatar, Button, Center, Flex, Input, Modal, ModalBody, ModalCloseButton, ModalContent, ModalFooter, ModalHeader, ModalOverlay, Select, Tab, TabList, TabPanel, TabPanels, Tabs, Text, Textarea, useDisclosure, useToast } from '@chakra-ui/react';
 import { NextPage } from 'next';
 import { useRouter } from 'next/router';
@@ -33,6 +33,7 @@ const Perfil: NextPage = () => {
     const [workoutId, setWorkoutId] = useState(0);
     const [workout, setWorkout] = useState<Workout>();
     const [plans, setPlans] = useState<Plan[]>();
+    const [deleteSubModal, setDeleteSubModal] = useState(false);
 
     useEffect(()=>{
         fetchProfile();
@@ -186,6 +187,24 @@ const Perfil: NextPage = () => {
         }
     }
 
+    const deleteSub = async () => {
+        setLoading(true);
+        try{
+            const response = await api.delete("/rest/v1/registrations", {
+                params:{
+                    id: `eq.${profile[0]?.id}`
+                }
+            });
+            if(response?.status === 200){
+                setLoading(false);
+                setDeleteSubModal(false);
+                router.push("/main/cadastros");
+            }
+        }catch(err){
+
+        }
+    }
+
     const updateProfile = async () => {
         setLoading(true);
         if(router?.query?.id){
@@ -260,6 +279,7 @@ const Perfil: NextPage = () => {
                         <Text fontSize="sm" mb="2" pb="3" fontFamily="Nunito" fontWeight="bold" color="gray" >{profile?.[0]?.objective}</Text>
                     </Flex>
                 </Flex>
+                <Button colorScheme="red" w="170px" mt="3" onClick={()=>setDeleteSubModal(true)} leftIcon={<DeleteIcon/>} size="md" >Excluir cadastro</Button>
             </Flex>
             <Flex w="74%" ml="7" h="100%">
                 <Flex w="100%" h="auto" >
@@ -483,6 +503,21 @@ const Perfil: NextPage = () => {
                         <ModalFooter>
                             <Button onClick={updateWorkout} isLoading={loading} colorScheme='blue'>
                             Editar
+                            </Button>
+                        </ModalFooter>
+                    </ModalContent>
+                </Modal>
+                <Modal isOpen={deleteSubModal} size="sm" onClose={onClose}>
+                    <ModalOverlay />
+                    <ModalContent>
+                        <ModalHeader>Deseja excluir o cadastro?</ModalHeader>
+                        <ModalCloseButton onClick={()=>setDeleteSubModal(false)} />
+                        <ModalBody>
+                        </ModalBody>
+
+                        <ModalFooter display="flex" justifyContent="center" >
+                            <Button onClick={deleteSub} size="lg" isLoading={loading} colorScheme='red'>
+                            Excluir
                             </Button>
                         </ModalFooter>
                     </ModalContent>
